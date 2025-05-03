@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Password Generator</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+</head>
+<body>
+  <h1>Password Generator</h1>
+
+  <form method="POST">
+    <label>Password Length:</label>
+    <input type="number" name="length" value="12" min="4" max="64" />
+
+    <label><input type="checkbox" name="uppercase" checked /> Include Uppercase</label>
+    <label><input type="checkbox" name="lowercase" checked /> Include Lowercase</label>
+    <label><input type="checkbox" name="digits" checked /> Include Digits</label>
+    <label><input type="checkbox" name="symbols" checked /> Include Symbols</label>
+
+    <button type="submit">Generate</button>
+  </form>
+
+  {% if password %}
+    <h2>Generated Password:</h2>
+    <p><strong>{{ password }}</strong></p>
+  {% endif %}
+
+  {% if error %}
+    <p style="color:red;">{{ error }}</p>
+  {% endif %}
+</body>
+</html>
