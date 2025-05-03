@@ -2,7 +2,7 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'prakhar16jain/password-generator'
+        IMAGE_NAME = 'vaidik404/password-generator'
         CONTAINER_NAME = 'password-generator-container'
         DOCKER_CREDENTIALS_ID = 'dockerhub'
     }
