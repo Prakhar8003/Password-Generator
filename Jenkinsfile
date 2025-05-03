@@ -2,31 +2,50 @@ pipeline {
     agent any
 
     environment {
-        IMAGE_NAME = 'password-generator'
+        IMAGE_NAME = 'prakhar16jain/password-generator'
         CONTAINER_NAME = 'password-generator-container'
+        DOCKER_CREDENTIALS_ID = 'dockerhub'
     }
 
     stages {
         stage('Build Docker Image') {
             steps {
                 script {
-                    sh "docker build -t ${IMAGE_NAME} ."
+                    def imageTag = env.BUILD_NUMBER
+                    sh "docker build -t ${IMAGE_NAME}:${imageTag} ."
                 }
             }
         }
 
-        stage('Stop Old Container (if exists)') {
+        stage('Login to Docker Hub') {
             steps {
-                script {
-                    sh "docker rm -f ${CONTAINER_NAME} || true"
+                withCredentials([usernamePassword(credentialsId: "${DOCKER_CREDENTIALS_ID}", passwordVariable: 'DOCKER_PASSWORD', usernameVariable: 'DOCKER_USERNAME')]) {
+                    sh "echo $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin"
                 }
             }
         }
 
-        stage('Run New Container') {
+        stage('Push Docker Image') {
             steps {
                 script {
-                    sh "docker run -d -p 5000:5000 --name ${CONTAINER_NAME} ${IMAGE_NAME}"
+                    def imageTag = env.BUILD_NUMBER
+                    sh "docker push ${IMAGE_NAME}:${imageTag}"
+                }
+            }
+        }
+
+        stage('Stop Old Container') {
+            steps {
+                sh "docker rm -f ${CONTAINER_NAME} || true"
+            }
+        }
+
+        stage('Pull New Image and Run') {
+            steps {
+                script {
+                    def imageTag = env.BUILD_NUMBER
+                    sh "docker pull ${IMAGE_NAME}:${imageTag}"
+                    sh "docker run -d -p 5000:5000 --name ${CONTAINER_NAME} ${IMAGE_NAME}:${imageTag}"
                 }
             }
         }
