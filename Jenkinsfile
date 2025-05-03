@@ -26,7 +26,7 @@ pipeline {
         stage('Run New Container') {
             steps {
                 script {
-                    sh "docker run -d --name ${CONTAINER_NAME} ${IMAGE_NAME}"
+                    sh "docker run -d -p 5000:5000 --name ${CONTAINER_NAME} ${IMAGE_NAME}"
                 }
             }
         }
