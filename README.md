@@ -1,1 +1,1 @@
-Just Checking the trigger
+Just Checking
