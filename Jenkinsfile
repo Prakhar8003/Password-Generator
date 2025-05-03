@@ -10,7 +10,10 @@ pipeline {
     stages {
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t ${IMAGE_NAME}:latest ."
+                script {
+                    def imageTag = env.BUILD_NUMBER
+                    sh "docker build -t ${IMAGE_NAME}:${imageTag} ."
+                }
             }
         }
 
@@ -24,7 +27,10 @@ pipeline {
 
         stage('Push Docker Image') {
             steps {
-                sh "docker push ${IMAGE_NAME}:latest"
+                script {
+                    def imageTag = env.BUILD_NUMBER
+                    sh "docker push ${IMAGE_NAME}:${imageTag}"
+                }
             }
         }
 
@@ -36,8 +42,11 @@ pipeline {
 
         stage('Pull New Image and Run') {
             steps {
-                sh "docker pull ${IMAGE_NAME}:latest"
-                sh "docker run -d -p 5000:5000 --name ${CONTAINER_NAME} ${IMAGE_NAME}:latest"
+                script {
+                    def imageTag = env.BUILD_NUMBER
+                    sh "docker pull ${IMAGE_NAME}:${imageTag}"
+                    sh "docker run -d -p 5000:5000 --name ${CONTAINER_NAME} ${IMAGE_NAME}:${imageTag}"
+                }
             }
         }
 
