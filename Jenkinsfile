@@ -4,6 +4,7 @@ pipeline {
     environment {
         IMAGE_NAME = 'prakhar16jain/password'
         DOCKER_CREDENTIALS_ID = 'dockerhub'
+        CONTAINER_NAME = 'password'
     }
 
     stages {
@@ -29,6 +30,32 @@ pipeline {
                 script {
                     def imagetag = env.BUILD_NUMBER
                     sh "docker push ${IMAGE_NAME}:${imagetag}"
+                }
+            }
+        }
+
+        stage('Stop Old Container') {
+            steps {
+                script {
+                    sh "docker rm -f ${CONTAINER_NAME}"
+                }
+            }
+        }
+
+        stage("Pull New Image and Run Container") {
+            steps {
+                script {
+                    def imagetag = env.BUILD_NUMBER
+                    sh "docker pull ${IMAGE_NAME}:${imagetag}"
+                    sh "docker run -d --name ${CONTAINER_NAME} -p 5000:5000 ${IMAGE_NAME}:${imagetag}"
+                }
+            }
+        }
+
+        stage('Verify Container') {
+            steps {
+                script {
+                    sh "docker ps | grep ${CONTAINER_NAME}"
                 }
             }
         }
